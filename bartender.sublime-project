@@ -6,6 +6,7 @@
   "build_systems":
   [{
     "name": "Run with args",
-    "cmd": ["./env/bin/python", "$file"]
+    "cmd": ["/bin/bash", "$project_path/develop-server.sh"],
+    "working_dir" : "$project_path"
   }]
 }
