@@ -15,7 +15,7 @@ def check_pass(pass_str, salt_str, valid_tok):
     salt_bytes = bytes.fromhex(salt_str)
     pass_bytes = pass_str.encode()
     token = salt_and_hash(pass_bytes, salt_bytes)
-    return valid_tok == token:
+    return valid_tok == token
 
 def salt_and_hash(pass_bytes, salt_bytes):
     digest = hashlib.pbkdf2_hmac('sha256', pass_bytes, salt_bytes, 10000)

@@ -6,7 +6,7 @@ import sqlite3
 import hashlib
 import datetime
 
-ISO8601 = '%Y-%m-%dT%H:%M:%S'
+
 
 auth = authentication.auth
 bp = Blueprint("booze", __name__)
