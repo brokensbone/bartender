@@ -16,8 +16,6 @@ def application_factory(extra_config=None):
     logging.basicConfig(level=logging.DEBUG)
     flapp = flask.Flask(__name__)
 
-    from .api import bp
-
     env_data_dir = os.getenv('APPLICATION_DATA')
     flapp.config.from_mapping(
         SECRET_KEY="test_mode",
@@ -29,8 +27,13 @@ def application_factory(extra_config=None):
         flapp.config.update(extra_config)
 
     init_data_dir(flapp)    
+    
+    from .api import bp
     flapp.register_blueprint(bp, url_prefix="/api")
 
+    from .authentication import bp as bp_auth
+    flapp.register_blueprint(bp_auth, url_prefix="/auth")
+    
     return flapp
 
 def init_data_dir(flapp):

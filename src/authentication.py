@@ -1,8 +1,11 @@
 from flask_httpauth import HTTPBasicAuth
 import os
 import hashlib
+from flask import Blueprint, request
+from src import database
 
 auth = HTTPBasicAuth()
+bp = Blueprint("auth", __name__)
 
 @auth.verify_password
 def verify_password(db, user_name, client_token):
@@ -17,11 +20,28 @@ def check_pass(pass_str, salt_str, valid_tok):
     salt_bytes = bytes.fromhex(salt_str)
     pass_bytes = pass_str.encode()
     token = salt_and_hash(pass_bytes, salt_bytes)
+    print(token)
+    print(valid_tok)
     return valid_tok == token
 
 def salt_and_hash(pass_bytes, salt_bytes):
     digest = hashlib.pbkdf2_hmac('sha256', pass_bytes, salt_bytes, 10000)
     return digest.hex()
+
+@bp.route("register", methods=["POST"])
+def api_reg():
+    db = database.app_database()
+    details = request.get_json()
+    register(db, details)
+    return {"register" : True }
+
+@bp.route("authenticate", methods=["POST"])
+def api_auth():
+    db = database.app_database()
+    details = request.get_json()
+    success = verify_password(db, details["user"], details["auth"])
+    return {"authenticate" : success }
+
 
 def register(db, details):
     user_name = details['user']
