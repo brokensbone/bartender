@@ -1,5 +1,6 @@
 from src import database, authentication, constants
 import os
+import base64
 
 def test_auth_flow(application):
     data_dir = application.config["DATA_DIR"]
@@ -61,3 +62,15 @@ def test_auth_flow_client(client):
     creds["auth"] = "not.the.password"
     r = client.post("auth/authenticate", json=creds)
     assert r.get_json()["authenticate"] == False
+
+    r = client.get("api/test")
+    assert r.status_code == 200
+
+    r = client.get("api/testauth")
+    assert r.status_code == 401
+
+    basic_auth = "{}:{}".format(user, pw)
+    valid_credentials = base64.b64encode(basic_auth.encode()).decode()
+    headers = {"Authorization": "Basic " + valid_credentials}
+    r = client.get("api/testauth", headers=headers)
+    assert r.status_code == 200

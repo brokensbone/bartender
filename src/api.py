@@ -14,3 +14,8 @@ bp = Blueprint("booze", __name__)
 @bp.route("/test", methods=['GET'])
 def test():
     return { "result" : "booze!", "score" : 13 }
+
+@bp.route("/testauth")
+@auth.login_required
+def test_auth():
+    return test()
