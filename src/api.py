@@ -13,4 +13,4 @@ bp = Blueprint("booze", __name__)
 
 @bp.route("/test", methods=['GET'])
 def test():
-    return { "result" : "booze!", "score" : 12 }
+    return { "result" : "booze!", "score" : 13 }

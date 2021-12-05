@@ -3,10 +3,12 @@ import flask
 import logging
 import os
 import datetime
+import sqlite3
 
 from . import constants
 
 VERSION = "0.1.0"
+DATABASE_VERSION = 1
 
 def application_factory(extra_config=None):
     
@@ -45,3 +47,44 @@ def init_data_dir(flapp):
         now = datetime.datetime.now()
         f.write(now.strftime(constants.ISO8601))
     
+    db_file = os.path.join(data_dir, constants.FILE_DATABASE)
+    run_db_updates(db_file)
+
+
+def run_db_updates(db_file):
+    if not os.path.exists(db_file):
+        upgrade_database(db_file, 0)
+
+    db_version = read_version(db_file)
+    while (db_version < DATABASE_VERSION):
+        upgrade_database(db_file, db_version+1)
+        db_version = read_version(db_file)
+
+
+def read_version(db_file):
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute("SELECT Value FROM Version")
+    r = cursor.fetchone()
+    conn.close()
+    version_number = r[0]
+    logging.info("DB VERSION = {}".format(version_number))
+    return version_number
+
+
+def upgrade_database(db_file, db_version):
+    sql_script = read_db_script(db_version)
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.executescript(sql_script)
+    cursor.execute("UPDATE Version SET Value = ?", (db_version,))
+    conn.commit()
+    conn.close()
+
+
+def read_db_script(db_version):
+    src_dir = os.path.dirname(__file__)
+    target_file = constants.FILE_DATABASE_SCRIPT.format(db_version)
+    script_path = os.path.join(src_dir, constants.DIRECTORY_DB, target_file)
+    with open(script_path, 'r') as f:
+        return f.read()

@@ -3,7 +3,7 @@ import tempfile
 import shutil
 import os
 
-from src.launch import application_factory, VERSION
+from src.launch import application_factory, VERSION, read_version, DATABASE_VERSION
 from src import constants
 
 @pytest.fixture
@@ -32,3 +32,7 @@ def test_version(application):
         written = f.read()
         assert written == VERSION
 
+def test_db_verson(application):
+    data_dir = application.config["DATA_DIR"]
+    db_file = os.path.join(data_dir, constants.FILE_DATABASE)
+    assert read_version(db_file) == DATABASE_VERSION
