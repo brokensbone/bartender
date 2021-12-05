@@ -8,7 +8,7 @@ import sqlite3
 from . import constants
 
 VERSION = "0.1.0"
-DATABASE_VERSION = 1
+DATABASE_VERSION = 2
 
 def application_factory(extra_config=None):
     

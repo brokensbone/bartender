@@ -1,13 +1,15 @@
 from flask_httpauth import HTTPBasicAuth
+import os
+import hashlib
 
 auth = HTTPBasicAuth()
 
 @auth.verify_password
-def verify_password(db, user_id, client_token):
-    with db.read() as conn, c:
-        c = conn.cursor()
-        rs = c.execute("SELECT salt, token FROM user WHERE rowid = ? AND approved = ? LIMIT 1", (user_id, 1))
-        for r in rs:
+def verify_password(db, user_name, client_token):
+    with db.read() as (conn, c):
+        c.execute("SELECT Salt, Token FROM user WHERE UserName = ? AND Approved = ? LIMIT 1", (user_name, 1))
+        r = c.fetchone()
+        if r:
             return check_pass(client_token, r[0], r[1])    
     return False
 
@@ -27,8 +29,12 @@ def register(db, details):
     salt_bytes = os.urandom(32)
     token = salt_and_hash(pass_bytes, salt_bytes)
     
-    salt_str = salt.hex()
+    salt_str = salt_bytes.hex()
     
-    with db.write() as conn, c:
-        c.execute("INSERT INTO user VALUES (?, ?, ?)", (user_name, token, salt_str))
+    with db.write() as (conn, c):
+        c.execute("INSERT INTO user VALUES (?, ?, ?, ?)", (user_name, token, salt_str, 0))
         return True
+
+def approve(db, user_name):
+    with db.write() as (conn, c):
+        c.execute("UPDATE User SET Approved = 1 WHERE UserName = ?", (user_name,))
