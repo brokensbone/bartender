@@ -5,7 +5,7 @@ import os
 import datetime
 import sqlite3
 
-from . import constants
+from . import constants, blueprints
 
 VERSION = "0.1.0"
 DATABASE_VERSION = 2
@@ -27,13 +27,8 @@ def application_factory(extra_config=None):
         flapp.config.update(extra_config)
 
     init_data_dir(flapp)    
-    
-    from .api import bp
-    flapp.register_blueprint(bp, url_prefix="/api")
+    blueprints.register(flapp)
 
-    from .authentication import bp as bp_auth
-    flapp.register_blueprint(bp_auth, url_prefix="/auth")
-    
     return flapp
 
 def init_data_dir(flapp):
