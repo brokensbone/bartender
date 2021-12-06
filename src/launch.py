@@ -8,7 +8,7 @@ import sqlite3
 from . import constants, blueprints
 
 VERSION = "0.1.0"
-DATABASE_VERSION = 2
+DATABASE_VERSION = 3
 
 def application_factory(extra_config=None):
     
