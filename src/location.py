@@ -3,9 +3,14 @@ class LocationManager():
     def __init__(self, database):
         self.db = database
 
+    def new_location_json(self, json_data):
+        json_data = json_data["data"]
+        return self.new_location(json_data["longitude"], json_data["latitude"], json_data["name"])
+
     def new_location(self, longitude, latitude, name):
         venue = Venue(longitude, latitude, name)
         venue.save(self.db)
+        return True
 
     def retrieve_location(self, location_id):
         with self.db.read() as (conn, c):
@@ -47,4 +52,16 @@ class Venue:
 
         with db.write() as (conn, c):
             c.execute(sql, vals)
+
+    def as_dict(self):
+        return {"rowid" : self.rowid,
+                "longitude" : self.longitude,
+                "latitude" : self.latitude,
+                "name": self.name 
+            }
+
+    def set_from_json(self, json_data):
+        self.longitude = json_data["longitude"]
+        self.latitude = json_data["latitude"]
+        self.name = json_data["name"]
 
