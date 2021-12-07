@@ -2,7 +2,7 @@ from flask import g, current_app
 import os
 
 from . import database as database_module
-from . import authentication, constants, location
+from . import authentication, constants, location, beverages
 
 """
 A dumping ground for methods that use the current flask app to build other objects.
@@ -22,6 +22,10 @@ def authenticator(database_instance=None):
 def location_manager(database_instance=None):
     database_instance =_inject_db(database_instance)
     return location.LocationManager(database_instance)
+
+def inventory(database_instance=None):
+    database_instance = _inject_db(database_instance)
+    return beverages.Inventory(database_instance)
 
 def _inject_db(database_instance):
     if database_instance is None:
