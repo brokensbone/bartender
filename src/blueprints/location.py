@@ -32,7 +32,7 @@ def api_update_location(rowid):
         return abort(404)
     v.set_from_json(venue_json)
     lm.update_location(v)
-    return {"result " : True}
+    return {"result" : True}
 
 @bp.route("search", methods=["GET"])
 @auth.login_required
